@@ -1,0 +1,60 @@
+# version: '3.8'
+
+services:
+  # Laravel App
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: laravel-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+    networks:
+      - devops-network
+
+  # Nginx Webserver (for Laravel)
+  webserver:
+    image: nginx:alpine
+    container_name: laravel-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - app
+    networks:
+      - devops-network
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: laravel-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel_db
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_PASSWORD: userpassword
+      MYSQL_USER: laravel_user
+    ports:
+      - "3306:3306"
+    networks:
+      - devops-network
+
+  # Vue Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vue-app
+    ports:
+      - "8080:80"
+    networks:
+      - devops-network
+
+networks:
+  devops-network:
+    driver: bridge
