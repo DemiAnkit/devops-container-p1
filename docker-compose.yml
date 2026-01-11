@@ -6,7 +6,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: laravel-app
+    container_name: laravel-app-dev
     restart: unless-stopped
     working_dir: /var/www
     volumes:
@@ -17,7 +17,7 @@ services:
   # Nginx Webserver (for Laravel)
   webserver:
     image: nginx:alpine
-    container_name: laravel-nginx
+    container_name: laravel-nginx-proxy
     restart: unless-stopped
     ports:
       - "8000:80"
@@ -32,7 +32,7 @@ services:
   # MySQL Database
   db:
     image: mysql:8.0
-    container_name: laravel-mysql
+    container_name: laravel-mysql-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: laravel_db
@@ -49,7 +49,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: vue-app
+    container_name: vue-app-dev
     ports:
       - "8080:80"
     networks:
@@ -58,3 +58,4 @@ services:
 networks:
   devops-network:
     driver: bridge
+    
